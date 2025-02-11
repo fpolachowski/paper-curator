@@ -1,0 +1,11 @@
+type Query {
+    getDocuments : [Book]
+    getDocumentById : Book
+}
+
+type Book {
+    title : String
+    url : String
+    shortDescription : String
+    description : String
+}
