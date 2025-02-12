@@ -13,11 +13,11 @@ data class Document(
     @Column(nullable = false)
     val title : String,
 
-    @Column(nullable = false)
-    val url : String,
+    @ElementCollection(fetch = FetchType.LAZY)
+    val urls : List<String>,
 
     @OneToMany(fetch = FetchType.LAZY, targetEntity = Author::class, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "authors", nullable = false)
+    @JoinColumn(name = "authors")
     val authors : List<Author>,
 
     @Column(nullable = false)
@@ -30,20 +30,10 @@ data class Document(
     val description : String,
 
     @Column(nullable = false)
-    val date : LocalDateTime = LocalDateTime.now()
+    val date : LocalDateTime = LocalDateTime.now(),
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    val categories : List<String>
 ) {
-    constructor() : this(null, "", "", listOf(), "", "", "")
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Document
-
-        return id == other.id
-    }
-
-    override fun hashCode(): Int {
-        return id?.hashCode() ?: 0
-    }
+    constructor() : this(null, "", listOf(), listOf(), "", "", "", LocalDateTime.now(), listOf())
 }

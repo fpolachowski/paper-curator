@@ -1,26 +1,23 @@
 package de.fpolachowski.papercurator.service
 
-import de.fpolachowski.papercurator.model.Author
 import de.fpolachowski.papercurator.model.Document
-import de.fpolachowski.papercurator.repository.AuthorRepository
 import de.fpolachowski.papercurator.repository.DocumentRepository
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class DocumentService(
-    private val documentRepository: DocumentRepository,
-    private val authorRepository: AuthorRepository
+    private val documentRepository: DocumentRepository
 ) {
 
     @EventListener(ApplicationReadyEvent::class)
     fun initDB() {
-        val author = authorRepository.save(Author(null, "Author"))
-        documentRepository.save(Document(null, "Title 1", "test.url", listOf(author), "content", "shortDescription", "description"))
-        documentRepository.save(Document(null, "Title 2", "test.url", listOf(author), "content", "shortDescription", "description"))
-        documentRepository.save(Document(null, "Title 3", "test.url", listOf(author), "content", "shortDescription", "description"))
+        documentRepository.save(Document(null, "Title 1", listOf(), listOf(), "content", "shortDescription", "description", LocalDateTime.now(), listOf()))
+        documentRepository.save(Document(null, "Title 2", listOf(), listOf(), "content", "shortDescription", "description", LocalDateTime.now(), listOf()))
+        documentRepository.save(Document(null, "Title 3", listOf(), listOf(), "content", "shortDescription", "description", LocalDateTime.now(), listOf()))
     }
 
     fun findAll(): MutableIterable<Document> {

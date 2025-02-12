@@ -6,11 +6,12 @@ type Query {
 
 type Document {
     title : String
-    url : String
+    urls : [String]
     shortDescription : String
     description : String
     date : String
     authors : [Author]
+    categories : [String]
 }
 
 type Author {
