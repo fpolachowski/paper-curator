@@ -1,11 +1,18 @@
 type Query {
-    getDocuments : [Book]
-    getDocumentById : Book
+    getDocuments : [Document]
+    getDocumentById : Document
+    findDocumentsByTitle : [Document]
 }
 
-type Book {
+type Document {
     title : String
     url : String
     shortDescription : String
     description : String
+    date : String
+    authors : [Author]
+}
+
+type Author {
+    name : String
 }

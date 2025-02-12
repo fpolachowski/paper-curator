@@ -25,7 +25,15 @@ class DocumentService(private val documentRepository: DocumentRepository) {
         return documentRepository.findByIdOrNull(id)
     }
 
+    fun findAllByTitle(title: String): List<Document> {
+        return documentRepository.findAllByTitle(title)
+    }
+
     fun save(document: Document): Document {
+        return documentRepository.save(document)
+    }
+
+    fun update(document: Document): Document {
         return documentRepository.save(document)
     }
 }

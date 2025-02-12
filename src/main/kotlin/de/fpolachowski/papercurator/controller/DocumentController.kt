@@ -17,4 +17,9 @@ class DocumentController(private val documentService: DocumentService) {
     fun getDocumentById(id: Long): Document? {
         return documentService.findById(id)
     }
+
+    @QueryMapping
+    fun findDocumentsByTitle(title: String): List<Document> {
+        return documentService.findAllByTitle(title)
+    }
 }
