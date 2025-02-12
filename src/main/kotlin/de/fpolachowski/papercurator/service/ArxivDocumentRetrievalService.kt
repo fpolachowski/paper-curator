@@ -1,42 +1,55 @@
 package de.fpolachowski.papercurator.service
 
+import com.rometools.rome.io.SyndFeedInput
+import com.rometools.rome.io.XmlReader
+
 import de.fpolachowski.papercurator.model.Document
+import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
-import org.w3c.dom.Element
-import org.w3c.dom.Node
-import javax.xml.parsers.DocumentBuilderFactory
-import org.w3c.dom.Document as DomDocument
+
+import java.net.URI
+import java.net.URL
+import java.nio.charset.StandardCharsets
 
 
 @Service
 class ArxivDocumentRetrievalService : DocumentRetrievalService {
-    private val factory = DocumentBuilderFactory.newInstance()
-    private val builder = factory.newDocumentBuilder()
     private val defaultSort = "lastUpdatedDate"
     private val defaultOrder = "ascending"
+    private val baseUrl = "http://export.arxiv.org/api"
+
+    @EventListener(ApplicationReadyEvent::class)
+    fun init() {
+        this.findByTitle("electron")
+    }
 
     override fun findAllByCategory(category: String): List<Document> {
-        TODO("Not yet implemented")
+        return listOf()
     }
 
     override fun findById(id: String): Document? {
-        TODO("Not yet implemented")
+        return null
     }
 
     override fun findByTitle(title: String): List<Document> {
-        val url = "http://export.arxiv.org/api/query?search_query=ti:\"${title}\"&sortBy=${this.defaultSort}&sortOrder=${this.defaultOrder}\n"
-        val doc: DomDocument = builder.parse(url)
+        val url = URI("${this.baseUrl}/query?search_query=ti:${title}&sortBy=${this.defaultSort}&sortOrder=${this.defaultOrder}").toURL()
+        return parseDocuments(url)
+    }
 
-        doc.documentElement.normalize()
-
-        val entries = doc.getElementsByTagName("entry")
-        for (i in 0..<entries.length) {
-            val node = entries.item(i)
-            if (node.nodeType != Node.ELEMENT_NODE) {continue}
-            val entry = node as Element
-            val entryTitle = entry.getElementsByTagName("title").item(0).textContent
-            if (entryTitle == "error") {continue} //TODO("Add Logging for errors")
-
+    fun parseDocuments(url : URL) : List<Document> {
+        val inputStream = url.openStream()
+        val reader = XmlReader(inputStream, StandardCharsets.UTF_8.name())
+        val input = SyndFeedInput()
+        val feed = input.build(reader)
+        val entries = feed.entries
+        for (entry in entries) {
+            println("\nTitle: ${entry.title}".trimIndent())
+            println("Updated: " + entry.updatedDate)
+            println("Link: " + entry.links)
+            println("Summary: " + entry.description)
+            println("Authors: " + entry.authors)
+            println("Categories: " + entry.categories)
         }
         return listOf()
     }
