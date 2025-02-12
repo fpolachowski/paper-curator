@@ -1,6 +1,8 @@
 package de.fpolachowski.papercurator.service
 
+import de.fpolachowski.papercurator.model.Author
 import de.fpolachowski.papercurator.model.Document
+import de.fpolachowski.papercurator.repository.AuthorRepository
 import de.fpolachowski.papercurator.repository.DocumentRepository
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
@@ -8,13 +10,17 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class DocumentService(private val documentRepository: DocumentRepository) {
+class DocumentService(
+    private val documentRepository: DocumentRepository,
+    private val authorRepository: AuthorRepository
+) {
 
     @EventListener(ApplicationReadyEvent::class)
     fun initDB() {
-        documentRepository.save(Document(null, "Title 1", "test.url", arrayOf(), "content", "shortDescription", "description"))
-        documentRepository.save(Document(null, "Title 2", "test.url", arrayOf(), "content", "shortDescription", "description"))
-        documentRepository.save(Document(null, "Title 3", "test.url", arrayOf(), "content", "shortDescription", "description"))
+        val author = authorRepository.save(Author(null, "Author"))
+        documentRepository.save(Document(null, "Title 1", "test.url", listOf(author), "content", "shortDescription", "description"))
+        documentRepository.save(Document(null, "Title 2", "test.url", listOf(author), "content", "shortDescription", "description"))
+        documentRepository.save(Document(null, "Title 3", "test.url", listOf(author), "content", "shortDescription", "description"))
     }
 
     fun findAll(): MutableIterable<Document> {

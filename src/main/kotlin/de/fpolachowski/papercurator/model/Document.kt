@@ -16,9 +16,9 @@ data class Document(
     @Column(nullable = false)
     val url : String,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = Author::class, cascade = [CascadeType.ALL])
     @JoinColumn(name = "authors", nullable = false)
-    val authors : Array<Author>,
+    val authors : List<Author>,
 
     @Column(nullable = false)
     val content : String,
@@ -32,7 +32,7 @@ data class Document(
     @Column(nullable = false)
     val date : LocalDateTime = LocalDateTime.now()
 ) {
-    constructor() : this(null, "", "", arrayOf(), "", "", "")
+    constructor() : this(null, "", "", listOf(), "", "", "")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
