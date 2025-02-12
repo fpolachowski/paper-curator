@@ -2,8 +2,10 @@ package de.fpolachowski.papercurator.service
 
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import de.fpolachowski.papercurator.model.Author
 
 import de.fpolachowski.papercurator.model.Document
+import de.fpolachowski.papercurator.repository.DocumentRepository
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
@@ -11,17 +13,21 @@ import org.springframework.stereotype.Service
 import java.net.URI
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.time.ZoneId
 
 
 @Service
-class ArxivDocumentRetrievalService : DocumentRetrievalService {
+class ArxivDocumentRetrievalService(
+    private val documentRepository: DocumentRepository
+) : DocumentRetrievalService {
     private val defaultSort = "lastUpdatedDate"
     private val defaultOrder = "ascending"
     private val baseUrl = "http://export.arxiv.org/api"
 
     @EventListener(ApplicationReadyEvent::class)
     fun init() {
-        this.findByTitle("electron")
+        val documents = this.findByTitle("electron")
+        documentRepository.saveAll(documents)
     }
 
     override fun findAllByCategory(category: String): List<Document> {
@@ -43,14 +49,27 @@ class ArxivDocumentRetrievalService : DocumentRetrievalService {
         val input = SyndFeedInput()
         val feed = input.build(reader)
         val entries = feed.entries
+
+        val documents = mutableListOf<Document>()
         for (entry in entries) {
-            println("\nTitle: ${entry.title}".trimIndent())
-            println("Updated: " + entry.updatedDate)
-            println("Link: " + entry.links)
-            println("Summary: " + entry.description)
-            println("Authors: " + entry.authors)
-            println("Categories: " + entry.categories)
+            val title = entry.title.trimIndent()
+            val updateDate = entry.updatedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+            val links = entry.links.map { it.href }
+            val authors = entry.authors.map { Author(null, it.name) }
+            val categories = entry.categories.map { it.name }
+
+            documents.add(Document(
+                null,
+                title,
+                links,
+                authors,
+                "",
+                "",
+                "",
+                updateDate,
+                categories
+            ))
         }
-        return listOf()
+        return documents
     }
 }
