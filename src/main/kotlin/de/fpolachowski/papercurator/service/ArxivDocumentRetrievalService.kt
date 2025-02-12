@@ -38,6 +38,6 @@ class ArxivDocumentRetrievalService : DocumentRetrievalService {
             if (entryTitle == "error") {continue} //TODO("Add Logging for errors")
 
         }
+        return listOf()
     }
-
 }
