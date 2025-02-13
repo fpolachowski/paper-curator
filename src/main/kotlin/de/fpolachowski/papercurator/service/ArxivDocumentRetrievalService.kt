@@ -7,16 +7,18 @@ import de.fpolachowski.papercurator.model.Author
 import de.fpolachowski.papercurator.model.Document
 import de.fpolachowski.papercurator.model.Link
 import de.fpolachowski.papercurator.repository.DocumentRepository
+import de.fpolachowski.papercurator.util.StringManipulator.Companion.cleanString
+import de.fpolachowski.papercurator.util.TimeManipulator.Companion.dateToLocalDateTime
 import org.springframework.ai.reader.ExtractedTextFormatter
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
+import java.io.FileNotFoundException
 import java.net.URI
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import java.time.ZoneId
 
 
 @Service
@@ -26,6 +28,8 @@ class ArxivDocumentRetrievalService(
     private val defaultSort = "lastUpdatedDate"
     private val defaultOrder = "ascending"
     private val baseUrl = "http://export.arxiv.org/api"
+    private val extractedTextFormatter = ExtractedTextFormatter.builder().build()
+    private val pdfDocumentReaderConfig = PdfDocumentReaderConfig.builder().withPageExtractedTextFormatter(extractedTextFormatter).build()
 
     @EventListener(ApplicationReadyEvent::class)
     fun init() {
@@ -45,25 +49,21 @@ class ArxivDocumentRetrievalService(
         val url = URI("${this.baseUrl}/query?search_query=ti:${title}&sortBy=${this.defaultSort}&sortOrder=${this.defaultOrder}").toURL()
         var documents = createDocuments(url)
         documents = parseDocuments(documents)
-        return documents
+        return documents.filter { it.content != "" }
     }
 
     fun parseDocuments(documents : List<Document>): List<Document> {
         for (document in documents) {
             val pdfUrl = document.urls.find { it.contentType == "application/pdf" } ?: continue
             try {
-                val pdfReader = PagePdfDocumentReader(
-                    pdfUrl.url,
-                    PdfDocumentReaderConfig.builder()
-                        .withPageExtractedTextFormatter(
-                            ExtractedTextFormatter.builder().build()
-                        ).build()
-                )
-                val content = pdfReader.read().toString()
+                val pdfReader = PagePdfDocumentReader(pdfUrl.url, pdfDocumentReaderConfig)
+                val content = pdfReader.read().map { it.text?.let { it1 -> cleanString(it1) } }.joinToString(separator = "")
                 document.content = content
             } catch (e: Exception) {
-                println(e.message)
-                continue
+                when (e.cause) {
+                    is FileNotFoundException -> continue //TODO(Logging)
+                    else -> throw e
+                }
             }
         }
 
@@ -83,8 +83,8 @@ class ArxivDocumentRetrievalService(
 
         val documents = mutableListOf<Document>()
         for (entry in entries) {
-            val title = entry.title.replace(Regex("""(\r\n)|\n|"""), "").replace(Regex("""\s+"""), " ")
-            val updateDate = entry.updatedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+            val title = cleanString(entry.title)
+            val updateDate = dateToLocalDateTime(entry.updatedDate)
             val links = entry.links.filter { it.type != null }.map { Link(null, it.href, it.type) }
             val authors = entry.authors.map { Author(null, it.name) }
             val categories = entry.categories.map { it.name }
