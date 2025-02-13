@@ -21,13 +21,13 @@ data class Document(
     @JoinColumn(name = "authors")
     val authors : List<Author>,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     var content : String,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     val shortDescription : String,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     val description : String,
 
     @Column(nullable = false)
