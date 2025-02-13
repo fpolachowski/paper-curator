@@ -13,15 +13,16 @@ data class Document(
     @Column(nullable = false)
     val title : String,
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    val urls : List<String>,
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "links")
+    val urls : List<Link>,
 
-    @OneToMany(fetch = FetchType.LAZY, targetEntity = Author::class, cascade = [CascadeType.ALL])
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "authors")
     val authors : List<Author>,
 
     @Column(nullable = false)
-    val content : String,
+    var content : String,
 
     @Column(nullable = false)
     val shortDescription : String,
