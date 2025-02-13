@@ -13,13 +13,6 @@ class DocumentService(
     private val documentRepository: DocumentRepository
 ) {
 
-    @EventListener(ApplicationReadyEvent::class)
-    fun initDB() {
-        documentRepository.save(Document(null, "Title 1", listOf(), listOf(), "content", "shortDescription", "description", LocalDateTime.now(), listOf()))
-        documentRepository.save(Document(null, "Title 2", listOf(), listOf(), "content", "shortDescription", "description", LocalDateTime.now(), listOf()))
-        documentRepository.save(Document(null, "Title 3", listOf(), listOf(), "content", "shortDescription", "description", LocalDateTime.now(), listOf()))
-    }
-
     fun findAll(): MutableIterable<Document> {
         return documentRepository.findAll()
     }
