@@ -11,30 +11,30 @@ data class Document(
     val id : Long? = null,
 
     @Column(nullable = false)
-    val title : String,
+    val title : String = "",
 
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(name = "links")
-    val urls : List<Link>,
+    val urls : List<Link> = listOf(),
 
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "authors")
-    val authors : List<Author>,
+    val authors : List<Author> = listOf(),
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    var content : String,
+    var content : String = "",
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    val shortDescription : String,
+    val shortDescription : String = "",
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    val description : String,
+    val description : String = "",
 
     @Column(nullable = false)
     val date : LocalDateTime = LocalDateTime.now(),
 
     @ElementCollection(fetch = FetchType.LAZY)
-    val categories : List<String>
+    val categories : List<String> = listOf()
 ) {
     constructor() : this(null, "", listOf(), listOf(), "", "", "", LocalDateTime.now(), listOf())
 }
