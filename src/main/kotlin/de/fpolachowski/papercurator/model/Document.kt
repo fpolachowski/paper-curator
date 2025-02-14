@@ -22,9 +22,6 @@ data class Document(
     val authors : List<Author> = listOf(),
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    var content : String = "",
-
-    @Column(nullable = false, columnDefinition = "TEXT")
     val shortDescription : String = "",
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -36,5 +33,5 @@ data class Document(
     @ElementCollection(fetch = FetchType.LAZY)
     val categories : List<String> = listOf()
 ) {
-    constructor() : this(null, "", listOf(), listOf(), "", "", "", LocalDateTime.now(), listOf())
+    constructor() : this(null, "", listOf(), listOf(), "", "", LocalDateTime.now(), listOf())
 }
