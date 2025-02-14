@@ -13,7 +13,11 @@ data class Link (
     val url: String,
 
     @Column(nullable = false)
-    val contentType : String,
+    val contentType : ContentType,
 ) {
-    constructor() : this(null, "", "")
+    constructor() : this(null, "", ContentType.WEBSITE)
+}
+
+enum class ContentType {
+    WEBSITE, PDF
 }
