@@ -29,12 +29,15 @@ class ArxivDocumentRetrieval(
     )
 
 //    @Scheduled(cron = "0 0 2 * * *", zone = "UTC") //TODO(include)
-    @Scheduled(fixedDelay = 86400000L)
+    @Scheduled(fixedDelay = 86400000L, initialDelay = 0)
     override fun retrieveDailyDocuments() {
-        for (category in categories) {
-            val documents = findAllByCategory(category)
-            documentRepository.saveAll(documents)
-        }
+        //for (category in categories) {
+        //    val documents = findAllByCategory(category)
+        //    documentRepository.saveAll(documents)
+        //}
+
+    val documents = findAllByTitle("electron")
+    documentRepository.saveAll(documents)
     }
 
     override fun findAllByCategory(category: String): List<Document> {
