@@ -1,8 +1,8 @@
 package de.fpolachowski.papercurator.etl
 
-import de.fpolachowski.papercurator.etl.arxiv.PaperDocumentReader
 import de.fpolachowski.papercurator.model.ContentType
 import de.fpolachowski.papercurator.model.Document
+import de.fpolachowski.papercurator.util.StringManipulator.Companion.cleanString
 import org.springframework.ai.document.Document as AIDocument
 import org.springframework.ai.document.DocumentTransformer
 import org.springframework.ai.document.DocumentWriter
@@ -23,14 +23,16 @@ class ETLPipeline(
                 val aiDocuments = documentReader.read(linkURL.url)
                 val transformedDocuments = documentTransformer.apply(aiDocuments)
 
-                // Insert metadata into [AIDocument] for filtering and association with source [Document]
+                // Clean the string and remove duplicate spaces
                 val finalDocuments = transformedDocuments.map { it.text?.let { text ->
                     AIDocument(
-                        text,
-                        mapOf("title" to document.title, "date" to document.date))
+                        cleanString(text),
+                        it.metadata
+                    )
                 } }
 
                 documentWriter.accept(finalDocuments)
+                document.documents = finalDocuments.mapNotNull { it?.id }
                 Thread.sleep(500) //To not exceed the api threshold
             } catch (e: Exception) {
                 when (e.cause) {
