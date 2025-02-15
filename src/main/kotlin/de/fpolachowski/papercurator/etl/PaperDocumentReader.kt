@@ -1,4 +1,4 @@
-package de.fpolachowski.papercurator.etl.arxiv
+package de.fpolachowski.papercurator.etl
 
 import org.springframework.ai.document.Document
 
