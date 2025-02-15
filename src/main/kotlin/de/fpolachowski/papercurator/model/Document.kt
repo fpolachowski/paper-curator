@@ -22,13 +22,16 @@ data class Document(
     val authors : List<Author> = listOf(),
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    val shortDescription : String = "",
+    val shortDescription : String = "Short description is still being initialized...",
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    val description : String = "",
+    val description : String = "Description is still being initialized...",
 
     @Column(nullable = false)
     val date : LocalDateTime = LocalDateTime.now(),
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    var documents : List<String> = listOf(),
 
     @ElementCollection(fetch = FetchType.LAZY)
     val categories : List<String> = listOf()

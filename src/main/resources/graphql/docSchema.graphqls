@@ -11,6 +11,7 @@ type Document {
     description : String
     date : String
     authors : [Author]
+    documents : [String]
     categories : [String]
 }
 
