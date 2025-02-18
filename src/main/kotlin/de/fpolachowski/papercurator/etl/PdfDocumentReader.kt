@@ -1,6 +1,5 @@
 package de.fpolachowski.papercurator.etl
 
-import de.fpolachowski.papercurator.etl.arxiv.PaperDocumentReader
 import org.springframework.ai.document.Document
 import org.springframework.ai.reader.ExtractedTextFormatter
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader
