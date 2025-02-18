@@ -3,6 +3,7 @@ package de.fpolachowski.papercurator.etl.arxiv
 import de.fpolachowski.papercurator.etl.DocumentRetrieval
 import de.fpolachowski.papercurator.etl.ETLPipeline
 import de.fpolachowski.papercurator.etl.PdfDocumentReader
+import de.fpolachowski.papercurator.etl.ollama.OllamaScribe
 import de.fpolachowski.papercurator.model.Document
 import de.fpolachowski.papercurator.repository.DocumentRepository
 import org.slf4j.LoggerFactory
@@ -18,12 +19,14 @@ import org.springframework.stereotype.Service
 @EnableScheduling
 class ArxivDocumentRetrieval(
     private val documentRepository: DocumentRepository,
-    private val vectorStore: PgVectorStore
+    private val vectorStore: PgVectorStore,
+    private val chatClient: OllamaScribe
 ) : DocumentRetrieval {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val defaultSort = "lastUpdatedDate"
     private val defaultOrder = "ascending"
     private val categories = listOf("cs")
+
     private val pipeline = ETLPipeline(
         AtomFeedParser(),
         PdfDocumentReader(),
@@ -34,15 +37,17 @@ class ArxivDocumentRetrieval(
 //    @Scheduled(cron = "0 0 2 * * *", zone = "UTC") //TODO(include)
     @Scheduled(fixedDelay = 86400000L, initialDelay = 0)
     override fun retrieveDailyDocuments() {
-        //for (category in categories) {
-        //    val documents = findAllByCategory(category)
-        //    documentRepository.saveAll(documents)
-        //}
         logger.info("Retrieving daily documents")
+        for (category in categories) {
+            val documents = findAllByCategory(category)
+            logger.info("Retrieved ${documents.size} documents for category $category")
 
-        val documents = findAllByTitle("electron")
-        documentRepository.saveAll(documents)
-        logger.info("Retrieved ${documents.size} documents")
+            logger.info("Processing descriptions of ${documents.size} documents for category $category")
+//            for (document in documents) {
+//                chatClient.ragByDocument(document, )
+//            }
+            documentRepository.saveAll(documents)
+        }
     }
 
     override fun findAllByCategory(category: String): List<Document> {
