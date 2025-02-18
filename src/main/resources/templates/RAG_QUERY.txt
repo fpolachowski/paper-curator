@@ -13,10 +13,6 @@ Respond to the user query using the provided context.
 ### Output:
 Provide a clear and direct response to the user's query.
 
-<context>
-{context}
-</context>
-
 <user_query>
 {query}
 </user_query>
