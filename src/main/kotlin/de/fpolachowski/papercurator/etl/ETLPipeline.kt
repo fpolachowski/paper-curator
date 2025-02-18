@@ -3,6 +3,7 @@ package de.fpolachowski.papercurator.etl
 import de.fpolachowski.papercurator.model.ContentType
 import de.fpolachowski.papercurator.model.Document
 import de.fpolachowski.papercurator.util.StringManipulator.Companion.cleanString
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.ai.document.Document as AIDocument
 import org.springframework.ai.document.DocumentTransformer
@@ -15,7 +16,7 @@ class ETLPipeline(
     private val documentTransformer: DocumentTransformer,
     private val documentWriter: DocumentWriter
 ) {
-    val logger = LoggerFactory.getLogger(javaClass)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun run(url : String) : List<Document> {
         val documents = documentRetriever.read(url)
@@ -32,7 +33,7 @@ class ETLPipeline(
                 val finalDocuments = transformedDocuments.map { it.text?.let { text ->
                     AIDocument(
                         cleanString(text),
-                        it.metadata
+                        it.metadata // Here is the magic as this stores meta information about the file and can be used for retrieval filtering
                     )
                 } }
 
