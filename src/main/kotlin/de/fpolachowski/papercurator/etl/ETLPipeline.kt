@@ -1,6 +1,5 @@
 package de.fpolachowski.papercurator.etl
 
-import de.fpolachowski.papercurator.etl.arxiv.PaperDocumentReader
 import de.fpolachowski.papercurator.model.ContentType
 import de.fpolachowski.papercurator.model.Document
 import org.springframework.ai.document.Document as AIDocument
