@@ -14,6 +14,14 @@ The project is composed of different components for retrieving, processing, and 
 5. Ollama Chat client using RAG Advisor to write short summaries of papers
 6. GraphQL Controller for providing client access to the stored paper information
 
+## Current publisher implementations
+
+- [Arxiv](https://arxiv.org/) through their [API](https://info.arxiv.org/help/rss.html)
+
+## Current covered article categories
+
+- Computer Science (CS)
+
 ## Dependencies
 
 - Spring for GraphQL
